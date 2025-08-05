@@ -4,3 +4,4 @@ streamlit
 langchain-community
 pypdf
 docx2txt
+openai
