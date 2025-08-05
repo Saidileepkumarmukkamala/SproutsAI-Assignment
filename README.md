@@ -13,45 +13,44 @@ A Streamlit-based application that recommends the most relevant candidates for a
 ## 💡 Approach
 
 1. **Input Collection**
-   - Accepts a job description via text box.
-   - Accepts multiple resumes via file upload (PDF, DOCX, or TXT).
+   - Job description (text box)
+   - Multiple resumes (PDF, DOCX, TXT)
 
-2. **Text Parsing**
-   - Extracts text using format-appropriate loaders.
+2. **Resume Parsing**
+   - Text extraction using appropriate file loaders
 
-3. **Vector Similarity (FAISS + OpenAI Embeddings)**
-   - Converts both job description and resumes into embeddings.
-   - Uses `FAISS.similarity_search_with_score()` to rank resumes by cosine similarity.
-   - Top 5 most relevant resumes are selected for further evaluation.
+3. **Semantic Similarity Ranking**
+   - Job description and resumes embedded with `OpenAIEmbeddings`
+   - FAISS used to compute cosine similarity
+   - Top 5 resumes selected
 
-4. **LLM Evaluation (RAG)**
-   - Uses OpenAI's `gpt-4o` model via LangChain’s `RetrievalQA`.
-   - A custom prompt is used to generate a **concise summary** explaining each candidate’s fit.
+4. **LLM Evaluation**
+   - `gpt-4o` processes each selected resume + job description
+   - Returns a **concise summary** on candidate relevance and strengths
 
 ---
 
 ## ✅ Features
 
-- ✅ Cosine similarity-based candidate ranking
-- ✅ LLM-generated explanations per candidate
-- ✅ Top 5 candidates automatically selected for deeper analysis
-- ✅ Upload resumes in common formats: `.pdf`, `.docx`, `.txt`
-- ✅ Secure API key handling via Streamlit secrets
+- Upload multiple resumes (PDF, DOCX, TXT)
+- OpenAI cosine similarity for ranking
+- GPT-4o summarization of top 5 candidates
+- Secure API key via Streamlit secrets
+- Clean & minimal UI using Streamlit with expandable recommendations
 
 ---
 
 ## 🔐 Assumptions
 
-- Resumes are typically 1–2 pages long and can fit into the LLM context window.
-- Cosine similarity is computed using OpenAI embeddings and FAISS.
-- LLM summarization is only applied to the top 5 resumes (for speed and cost efficiency).
-- API keys are not hardcoded but managed securely using `.streamlit/secrets.toml` (locally) or Streamlit Cloud secrets.
+- Resumes are 1–2 pages (fit within LLM context window)
+- Cosine similarity is based on normalized OpenAI embeddings
+- Only top 5 resumes go through the extensive LLM summarization step
 
 ---
 
-## 📦 Setup Instructions
+## 📦 Setup
 
-1. **Install requirements:**
+1. **Install dependencies**
 
 ```bash
 pip install -r requirements.txt
