@@ -16,7 +16,7 @@ os.environ["OPENAI_API_KEY"] = openai_api_key
 
 @st.cache_resource
 def load_llm():
-    return ChatOpenAI(model_name="gpt-4o", temperature=0.7,api_key=openai_api_key)
+    return ChatOpenAI(model_name="gpt-4o", temperature=0.7, api_key=openai_api_key)
 
 @st.cache_resource
 def get_embeddings():
@@ -50,13 +50,6 @@ def build_vectorstore(documents):
     vectordb = FAISS.from_documents(documents, embeddings)
     return vectordb
 
-def build_qa_chain(docs):
-    vectordb1 = FAISS.from_documents(docs, get_embeddings())
-    retriever = vectordb1.as_retriever(search_type="similarity", search_kwargs={"k": 3})
-    llm = load_llm()
-    qa = RetrievalQA.from_chain_type(llm=llm, retriever=retriever, return_source_documents=True)
-    return qa
-
 def main():
     st.title("Candidate Recommendation Engine")
     job_description = st.text_area("Enter the Job Description", height=200)
@@ -64,7 +57,7 @@ def main():
 
     if st.button("Find Top Candidates"):
         if not job_description or not resume_files:
-            st.error("Please provide both a job description and at least one resume.")
+            st.warning("Please provide both a job description and at least one resume.")
             return
 
         with st.spinner("Processing resumes and calculating similarity scores..."):
@@ -78,22 +71,22 @@ def main():
                 top_resumes.append({
                     "file_name": doc.metadata["source"],
                     "text": doc.page_content,
-                    "score": similarity_score,
-                    "doc": doc
+                    "score": similarity_score
                 })
 
-            qa_chain = build_qa_chain([r["doc"] for r in top_resumes])
+            llm = load_llm()
             results = []
 
             for resume in top_resumes:
-                question = f"Is this resume a good fit for the following job description?\n{job_description}\nGive a concise summary about the fit. Be specific and concise."
-                response = qa_chain.invoke({"query": question, "context": resume["text"]})
-                answer = response["result"] if "result" in response else "No response generated."
-
+                prompt = (
+                    f"Is this resume a good fit for the following job description. Give a concise summary about the fit. Be specific and concise."
+                    f"Job Description:\n{job_description}\n\nResume:\n{resume['text']}\n\nCosine Similarity Score:\n{resume['score']}"
+                )
+                response = llm.invoke(prompt)
                 results.append({
                     "Candidate": resume["file_name"],
                     "Similarity Score": resume["score"],
-                    "LLM Recommendation": answer
+                    "LLM Recommendation": response.content if hasattr(response, "content") else str(response)
                 })
 
             df = pd.DataFrame(results).sort_values(by="Similarity Score", ascending=False)
@@ -103,7 +96,7 @@ def main():
             for index, row in df.iterrows():
                 with st.expander(row["Candidate"]):
                     st.markdown(f"**Similarity Score:** {row['Similarity Score']}")
-                    st.markdown(f"**LLM Summary:** {row['LLM Recommendation']}")
+                    st.markdown(f"**LLM Recommendation:** {row['LLM Recommendation']}")
 
 if __name__ == '__main__':
     main()
