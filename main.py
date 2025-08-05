@@ -11,7 +11,9 @@ import pandas as pd
 import shutil
 
 st.set_page_config(page_title="Candidate Recommendation RAG", layout="wide")
-openai_api_key = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+openai_api_key = st.secrets["OPENAI_API_KEY"]
+os.environ["OPENAI_API_KEY"] = openai_api_key
+
 
 def save_uploaded_file(uploadedfile):
     with tempfile.NamedTemporaryFile(delete=False) as tmp:
