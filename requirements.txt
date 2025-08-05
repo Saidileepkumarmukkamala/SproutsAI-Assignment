@@ -2,3 +2,5 @@ langchain
 pandas
 streamlit
 langchain-community
+pypdf
+docx2txt
