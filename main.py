@@ -79,14 +79,14 @@ def main():
 
             for resume in top_resumes:
                 prompt = (
-                    f"Is this resume a good fit for the following job description. Give a concise summary about the fit. Be specific and concise."
+                    f"Is this resume a good fit for the following job description. Give a concise summary about the fit. Be specific and concise. Mention Yes or NO"
                     f"Job Description:\n{job_description}\n\nResume:\n{resume['text']}\n\nCosine Similarity Score:\n{resume['score']}"
                 )
                 response = llm.invoke(prompt)
                 results.append({
                     "Candidate": resume["file_name"],
                     "Similarity Score": resume["score"],
-                    "LLM Recommendation": response.content if hasattr(response, "content") else str(response)
+                    "LLM Summary": response.content if hasattr(response, "content") else str(response)
                 })
 
             df = pd.DataFrame(results).sort_values(by="Similarity Score", ascending=False)
@@ -96,7 +96,7 @@ def main():
             for index, row in df.iterrows():
                 with st.expander(row["Candidate"]):
                     st.markdown(f"**Similarity Score:** {row['Similarity Score']}")
-                    st.markdown(f"**LLM Recommendation:** {row['LLM Recommendation']}")
+                    st.markdown(f"**LLM Summary:** {row['LLM Summary']}")
 
 if __name__ == '__main__':
     main()
