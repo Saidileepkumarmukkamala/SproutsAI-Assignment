@@ -1,51 +1,57 @@
 # Candidate Recommendation Engine (SproutsAI Internship Assignment)
 
-This is a Streamlit-based web application that recommends the most relevant candidates for a job description using LLM-powered semantic search and summarization (RAG).
+A Streamlit-based application that recommends the most relevant candidates for a job by combining **vector similarity search** with **LLM-powered evaluation** (RAG).
 
-## 🚀 Live App
+---
 
-🔗 [Click here to view the app](https://your-username-your-app-name.streamlit.app/)  
+## 🚀 Live Demo
+
+🔗 [Your Deployed App Link](https://sproutsai-assignment-sai-dileep-kumar-m.streamlit.app/)  
+
 ---
 
 ## 💡 Approach
 
-1. **Input Collection:**
-   - Accepts a job description via text input.
-   - Accepts resumes via file upload (PDF, DOCX, or TXT).
+1. **Input Collection**
+   - Accepts a job description via text box.
+   - Accepts multiple resumes via file upload (PDF, DOCX, or TXT).
 
-2. **Document Parsing:**
-   - Extracts text from each resume using appropriate loaders.
+2. **Text Parsing**
+   - Extracts text using format-appropriate loaders.
 
-3. **Embedding & Retrieval (RAG):**
-   - Embeds resume content using `OpenAIEmbeddings`.
-   - Stores embeddings in a FAISS vector store.
-   - For each resume, a Retrieval-Augmented Generation (RAG) chain is used to evaluate its relevance to the job description.
+3. **Vector Similarity (FAISS + OpenAI Embeddings)**
+   - Converts both job description and resumes into embeddings.
+   - Uses `FAISS.similarity_search_with_score()` to rank resumes by cosine similarity.
+   - Top 5 most relevant resumes are selected for further evaluation.
 
-4. **LLM Evaluation:**
-   - Uses `gpt-4o` (or latest OpenAI model).
-   - Prompts the model to return a **concise, clear summary** explaining why the candidate is (or isn’t) a good fit for the role.
+4. **LLM Evaluation (RAG)**
+   - Uses OpenAI's `gpt-4o` model via LangChain’s `RetrievalQA`.
+   - A custom prompt is used to generate a **concise summary** explaining each candidate’s fit.
 
 ---
 
 ## ✅ Features
 
-- OpenAI-powered semantic evaluation (not just keyword matching)
-- AI-generated summaries for recruiter-friendly results
-- Upload and analyze multiple resumes simultaneously
-- Clean and minimal UI built with Streamlit
+- ✅ Cosine similarity-based candidate ranking
+- ✅ LLM-generated explanations per candidate
+- ✅ Top 5 candidates automatically selected for deeper analysis
+- ✅ Upload resumes in common formats: `.pdf`, `.docx`, `.txt`
+- ✅ Secure API key handling via Streamlit secrets
 
 ---
 
 ## 🔐 Assumptions
 
-- Resumes are typically **1–2 pages long**, which comfortably fits within the **context window of GPT-4o** (128k tokens).
-- Therefore, the **text splitting step was removed** for simplicity and direct evaluation.
-- Resumes are written in English and follow a general professional structure.
-- OpenAI API key is stored securely via Streamlit Cloud's `secrets.toml` (not hardcoded).
+- Resumes are typically 1–2 pages long and can fit into the LLM context window.
+- Cosine similarity is computed using OpenAI embeddings and FAISS.
+- LLM summarization is only applied to the top 5 resumes (for speed and cost efficiency).
+- API keys are not hardcoded but managed securely using `.streamlit/secrets.toml` (locally) or Streamlit Cloud secrets.
 
 ---
 
-## 📦 Setup (Local)
+## 📦 Setup Instructions
+
+1. **Install requirements:**
 
 ```bash
 pip install -r requirements.txt
